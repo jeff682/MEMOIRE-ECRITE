@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Auteur as Auteur (navigateur)
+    participant Frontend as Frontend (HTML/JS)
+    participant Backend as Backend (Django)
+    participant DB as Base de données (PostgreSQL)
+    participant Storage as Stockage (fichiers PDF)
+
+    Auteur->>Frontend: Remplit le formulaire de soumission
+    Auteur->>Frontend: Sélectionne le fichier PDF
+    Auteur->>Frontend: Clique sur "Soumettre"
+    Frontend->>Backend: POST /api/soumettre/ (titre, résumé, fichier, type, discipline, mots-clés)
+    Backend->>Backend: Vérifie que l’utilisateur est authentifié et a le rôle "auteur"
+    Backend->>Storage: Sauvegarde le fichier PDF (attribue un nom unique)
+    Storage-->>Backend: Confirmation d’enregistrement (URL ou chemin)
+    Backend->>DB: Crée une nouvelle instance de Publication (statut = "brouillon")
+    Backend->>DB: Associe l’auteur (ForeignKey) et les catégories
+    DB-->>Backend: Confirmation de création (ID de la publication)
+    Backend-->>Frontend: Réponse JSON (succès, id_publication)
+    Frontend-->>Auteur: Affiche "Votre article a été enregistré en brouillon" + lien vers tableau de bord
+    Note over Auteur,Frontend: L’auteur peut ensuite modifier son brouillon ou le soumettre à relecture

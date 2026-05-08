@@ -1,0 +1,57 @@
+graph TD
+    %% Acteurs
+    Visiteur["Visiteur (non connecté)"]
+    Auteur["Auteur (connecté)"]
+    Relecteur["Relecteur (comité)"]
+    Editeur["Éditeur (administrateur)"]
+
+    %% Boîte système
+    box "Mémoire Écrite"
+        usecase_consulter["Consulter les publications"]
+        usecase_recherche["Rechercher (mot-clé)"]
+        usecase_filtres["Appliquer des filtres (type, discipline, année)"]
+        usecase_inscription["S'inscrire"]
+        usecase_connexion["Se connecter"]
+        usecase_deconnexion["Se déconnecter"]
+        usecase_soumettre["Soumettre un article"]
+        usecase_modifier_brouillon["Modifier son brouillon"]
+        usecase_suivi["Suivre l’état de sa soumission"]
+        usecase_evaluer["Évaluer un article (accepter/refuser/demander modif)"]
+        usecase_doi["Attribuer un DOI"]
+        usecase_publier["Publier l’article (rendre public)"]
+        usecase_gerer_users["Gérer les utilisateurs (rôles)"]
+        usecase_gerer_categories["Gérer les catégories (types, disciplines)"]
+        usecase_statistiques["Consulter les statistiques"]
+    end
+
+    %% Associations Visiteur
+    Visiteur --> usecase_consulter
+    Visiteur --> usecase_recherche
+    Visiteur --> usecase_filtres
+    Visiteur --> usecase_inscription
+
+    %% Associations Auteur (inclut Visiteur, donc hérite)
+    Auteur --> usecase_connexion
+    Auteur --> usecase_soumettre
+    Auteur --> usecase_modifier_brouillon
+    Auteur --> usecase_suivi
+    Auteur --> usecase_deconnexion
+
+    %% Relations d'héritage (extension)
+    Auteur --|> Visiteur
+
+    %% Associations Relecteur
+    Relecteur --> usecase_connexion
+    Relecteur --> usecase_evaluer
+    Relecteur --> usecase_deconnexion
+    Relecteur --|> Auteur   (un relecteur peut aussi soumettre ? optionnel, on le laisse pour flexibilité)
+
+    %% Associations Éditeur
+    Editeur --> usecase_connexion
+    Editeur --> usecase_doi
+    Editeur --> usecase_publier
+    Editeur --> usecase_gerer_users
+    Editeur --> usecase_gerer_categories
+    Editeur --> usecase_statistiques
+    Editeur --> usecase_deconnexion
+    Editeur --|> Relecteur
