@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mémoire Écrite · Explorer les contenus</title>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-page: #F5F1EB;
+            --surface-white: #FFFFFF;
+            --surface-alt: #E7E1D6;
+            --hero-bg: #2A3B2C;
+            --hero-text: #FEF7E6;
+            --primary: #B87B4A;
+            --primary-dark: #8B5A2E;
+            --secondary: #6F8F6F;
+            --text-main: #2C2A27;
+            --text-muted: #6B6359;
+            --border-light: #DCD3C6;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --radius-card: 0.75rem;
+            --radius-hero: 1rem;
+            --radius-btn: 1.5rem;
+            --radius-modal: 1rem;
+            --radius-input: 1.5rem;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER */
+        .site-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.9rem 0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            color: var(--primary);
+        }
+        .nav-menu {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary);
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.7rem;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem 0 0.5rem;
+            }
+            .nav-menu.open {
+                display: flex;
+            }
+        }
+
+        /* HERO */
+        .hero {
+            margin: 2rem 0 1.5rem;
+            background: var(--hero-bg);
+            color: var(--hero-text);
+            border-radius: var(--radius-hero);
+            padding: 2rem 1.8rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .hero p {
+            max-width: 700px;
+            margin: 0.5rem auto 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* FILTRES SIMPLES (type document) */
+        .filters-section {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        .filter-btn i {
+            margin-right: 0.4rem;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .search-simple {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: var(--bg-page);
+            border-radius: var(--radius-input);
+            padding: 0.3rem 0.8rem;
+            border: 1px solid var(--border-light);
+        }
+        .search-simple input {
+            border: none;
+            background: transparent;
+            padding: 0.4rem;
+            width: 180px;
+            outline: none;
+        }
+
+        /* GRILLE CONTENUS */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0 2rem;
+        }
+        @media (min-width: 640px) {
+            .articles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .articles-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .card {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .card-content {
+            padding: 1.2rem;
+            flex: 1;
+        }
+        .type-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            background: var(--surface-alt);
+            padding: 0.2rem 0.7rem;
+            border-radius: 1rem;
+            margin-bottom: 0.6rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .excerpt {
+            font-size: 0.85rem;
+            margin-bottom: 0.6rem;
+            line-height: 1.4;
+        }
+        .doi-badge {
+            font-family: monospace;
+            background: #F1EDE7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .card-footer {
+            padding: 0.7rem 1.2rem 1rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-read {
+            background: transparent;
+            border: none;
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .btn-cite {
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* Résultats header */
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 1rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* FOOTER */
+        .site-footer {
+            background: #2A2A28;
+            color: #DCD3C6;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-col h4 {
+            color: #E7DDD0;
+            margin-bottom: 0.5rem;
+        }
+        .footer-col p, .footer-col a {
+            color: #B9B0A2;
+            text-decoration: none;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+        .social-icons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #4A4640;
+            padding-top: 1rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 650px) {
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-simple {
+                width: 100%;
+            }
+            .search-simple input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-flex">
+        <div class="logo">Mémoire<span>Écrite</span></div>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="nav-menu" id="navMenu">
+            <a href="#">Accueil</a>
+            <a href="#">Recherche</a>
+            <a href="#" class="active">Contenus</a>
+            <a href="#">Littérature</a>
+            <a href="#">Cinéma</a>
+            <a href="#">Soumettre</a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="hero">
+        <h1><i class="fas fa-th-large"></i> Explorer les contenus</h1>
+        <p>Découvrez nos publications par type de document : géographie, histoire, littérature, cinéma, anthropologie, arts…</p>
+    </div>
+
+    <!-- Filtres simples -->
+    <div class="filters-section">
+        <div class="filter-buttons" id="filterButtons">
+            <button class="filter-btn active" data-type="all"><i class="fas fa-globe"></i> Tous</button>
+            <button class="filter-btn" data-type="geographie"><i class="fas fa-map-marker-alt"></i> Géographie</button>
+            <button class="filter-btn" data-type="histoire"><i class="fas fa-landmark"></i> Histoire</button>
+            <button class="filter-btn" data-type="litterature"><i class="fas fa-book"></i> Littérature</button>
+            <button class="filter-btn" data-type="cinema"><i class="fas fa-film"></i> Cinéma</button>
+            <button class="filter-btn" data-type="anthropologie"><i class="fas fa-hand-peace"></i> Anthropologie</button>
+            <button class="filter-btn" data-type="arts"><i class="fas fa-palette"></i> Arts</button>
+        </div>
+        <div class="search-simple">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Titre, auteur...">
+        </div>
+    </div>
+
+    <div class="results-info">
+        <h2><span id="resultCount">0</span> publication(s)</h2>
+        <small><i class="fas fa-database"></i> Contenus évalués · DOI pérennes · Libre accès</small>
+    </div>
+    <div id="articlesContainer" class="articles-grid"></div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Mémoire Écrite</h4>
+                <p>Plateforme de diffusion de la recherche, des critiques littéraires et cinématographiques. Tous les contenus sont évalués et librement réutilisables.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liens utiles</h4>
+                <a href="#">Comité scientifique</a>
+                <a href="#">Soumettre un article</a>
+                <a href="#">Politique éditoriale</a>
+                <a href="#">API & métadonnées</a>
+                <a href="#">Mentions légales</a>
+            </div>
+            <div class="footer-col">
+                <h4>Suivez-nous</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-mastodon"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+                <p>contact@memoire-ecrite.org</p>
+                <p>Dakar / Abidjan / Paris</p>
+            </div>
+            <div class="footer-col">
+                <h4>Partenaires</h4>
+                <p>African Journals Online</p>
+                <p>OpenEdition</p>
+                <p>Crossref</p>
+                <p>Isidore</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2026 Mémoire Écrite — ISSN 2826-2345 — Licence Creative Commons BY-SA 4.0</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Modal Lecture -->
+<div id="articleModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background: var(--surface-white); max-width:700px; width:90%; max-height:85vh; border-radius:var(--radius-modal); padding:1.5rem; overflow:auto; position:relative;">
+        <span id="closeModal" style="position:absolute; top:0.8rem; right:1.2rem; font-size:1.8rem; cursor:pointer;">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    // Base de données étoffée avec types : géographie, histoire, littérature, cinéma, anthropologie, arts
+    const contentData = [
+        { id: 1, type: "geographie", title: "Mobilités pastorales et conflits d'usage au Sahel", author: "A. Diallo", year: 2026, doi: "10.5678/memoire.2026.01", excerpt: "Analyse géopolitique des transhumances entre Mali, Burkina et Niger.", fullContent: "<p>Cet article mobilise des données satellitaires et des enquêtes de terrain pour modéliser les zones de tension liées à l'élevage transhumant.</p>", img: "https://picsum.photos/id/15/400/240", typeLabel: "Géographie" },
+        { id: 2, type: "histoire", title: "Les comptoirs portugais en Afrique de l'Ouest (XVe-XVIe)", author: "M. Ferreira", year: 2025, doi: "10.5678/memoire.2025.04", excerpt: "Nouvelles perspectives archéologiques sur les échanges précoloniaux.", fullContent: "<p>Fouilles récentes à Arguin et São Jorge da Mina révèlent des interactions complexes entre Africains et Européens.</p>", img: "https://picsum.photos/id/118/400/240", typeLabel: "Histoire" },
+        { id: 3, type: "litterature", title: "Ahmadou Kourouma et la dérision postcoloniale", author: "S. Kouadio", year: 2026, doi: "10.5678/memoire.2026.08", excerpt: "Étude de l'humour noir dans 'Les Soleils des indépendances'.", fullContent: "<p>Kourouma invente une langue métissée pour dénoncer les dictatures. Analyse stylistique et politique.</p>", img: "https://picsum.photos/id/20/400/240", typeLabel: "Littérature" },
+        { id: 4, type: "cinema", title: "L'évolution du cinéma documentaire au Sénégal", author: "B. Sarr", year: 2026, doi: "10.5678/memoire.2026.14", excerpt: "De Safi Faye à Ousmane Sembène, regards engagés.", fullContent: "<p>Le documentaire sénégalais comme outil de contre-récit historique. Entretiens avec des cinéastes contemporains.</p>", img: "https://picsum.photos/id/96/400/240", typeLabel: "Cinéma" },
+        { id: 5, type: "anthropologie", title: "Croyances et médecine traditionnelle bantoue", author: "P. Mbarga", year: 2025, doi: "10.5678/memoire.2025.22", excerpt: "Une étude ethnographique au Cameroun forestier.", fullContent: "<p>Rôle des nganga dans la transmission des savoirs thérapeutiques et l'équilibre social.</p>", img: "https://picsum.photos/id/127/400/240", typeLabel: "Anthropologie" },
+        { id: 6, type: "arts", title: "La tapisserie contemporaine en Afrique de l'Est", author: "G. Uwimana", year: 2026, doi: "10.5678/memoire.2026.20", excerpt: "Innovations esthétiques à l'école de Ruhango (Rwanda).", fullContent: "<p>Analyse des motifs et des matériaux : du raphia aux fibres recyclées, un art aux dimensions sociales.</p>", img: "https://picsum.photos/id/30/400/240", typeLabel: "Arts" },
+        { id: 7, type: "geographie", title: "Urbanisation et inondations à Abidjan", author: "K. Tano", year: 2026, doi: "10.5678/memoire.2026.27", excerpt: "Cartographie des zones à risque et stratégies d'adaptation.", fullContent: "<p>Utilisation de SIG pour modéliser l'impact de l'étalement urbain sur les bassins versants.</p>", img: "https://picsum.photos/id/104/400/240", typeLabel: "Géographie" },
+        { id: 8, type: "histoire", title: "Les résistances anticoloniales en Casamance", author: "C. Diatta", year: 2025, doi: "10.5678/memoire.2025.31", excerpt: "Mémoire des révoltes oubliées (1880-1920).", fullContent: "<p>Archives orales et écrites reconstituent les figures de chefs locaux comme Aline Sitoé Diatta.</p>", img: "https://picsum.photos/id/108/400/240", typeLabel: "Histoire" },
+        { id: 9, type: "litterature", title: "Poétique de l'errance dans 'Verre Cassé' d'Alain Mabanckou", author: "E. Nsom", year: 2026, doi: "10.5678/memoire.2026.35", excerpt: "Le personnage du ‘sociétaire’ comme allégorie congolaise.", fullContent: "<p>Analyse narrative et intertextuelle du roman le plus célèbre de Mabanckou.</p>", img: "https://picsum.photos/id/20/400/240", typeLabel: "Littérature" },
+        { id: 10, type: "cinema", title: "Matriarcat et sororité dans 'Atlantique' (Mati Diop)", author: "F. Gaye", year: 2025, doi: "10.5678/memoire.2025.41", excerpt: "Une lecture féministe du film sénégalais.", fullContent: "<p>Comment le film renverse les codes du mélodrame pour parler de migration et de solidarité féminine.</p>", img: "https://picsum.photos/id/96/400/240", typeLabel: "Cinéma" },
+        { id: 11, type: "anthropologie", title: "Initiation et identité chez les Dogon", author: "I. Sidibé", year: 2026, doi: "10.5678/memoire.2026.44", excerpt: "Rituels du sigui et transformations contemporaines.", fullContent: "<p>Terrain long format dans la falaise de Bandiagara, analyse des mutations générationnelles.</p>", img: "https://picsum.photos/id/117/400/240", typeLabel: "Anthropologie" },
+        { id: 12, type: "arts", title: "Graffiti et street art à Kinshasa", author: "D. Lumbala", year: 2026, doi: "10.5678/memoire.2026.49", excerpt: "La 'sape' visuelle sur les murs de la capitale congolaise.", fullContent: "<p>Une exploration des fresques engagées et de leur réception populaire.</p>", img: "https://picsum.photos/id/106/400/240", typeLabel: "Arts" }
+    ];
+
+    // Éléments DOM
+    const container = document.getElementById('articlesContainer');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const searchInput = document.getElementById('searchInput');
+    let currentType = 'all';
+    let currentSearch = '';
+
+    const modal = document.getElementById('articleModal');
+    const modalBody = document.getElementById('modalBody');
+    const closeModal = document.getElementById('closeModal');
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderArticles() {
+        let filtered = contentData.filter(article => {
+            if (currentType !== 'all' && article.type !== currentType) return false;
+            if (currentSearch.trim() !== '') {
+                const haystack = (article.title + ' ' + article.author + ' ' + article.excerpt).toLowerCase();
+                return haystack.includes(currentSearch.toLowerCase());
+            }
+            return true;
+        });
+        document.getElementById('resultCount').innerText = filtered.length;
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Aucun contenu ne correspond à ces critères. Modifiez vos filtres.</div>`;
+            return;
+        }
+        container.innerHTML = filtered.map(article => `
+            <div class="card">
+                <img class="card-img" src="${article.img}" alt="${article.title}" loading="lazy">
+                <div class="card-content">
+                    <span class="type-badge"><i class="fas ${getIconForType(article.type)}"></i> ${article.typeLabel}</span>
+                    <h3>${escapeHtml(article.title)}</h3>
+                    <div class="card-meta"><span><i class="fas fa-user"></i> ${escapeHtml(article.author)}</span> <span>${article.year}</span></div>
+                    <p class="excerpt">${escapeHtml(article.excerpt)}</p>
+                    <div class="doi-badge">DOI: ${article.doi}</div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn-read" data-id="${article.id}"><i class="fas fa-book-open"></i> Lire</button>
+                    <button class="btn-cite" data-doi="${article.doi}" data-title="${escapeHtml(article.title)}" data-author="${escapeHtml(article.author)}"><i class="fas fa-quote-right"></i> Citer</button>
+                </div>
+            </div>
+        `).join('');
+        // Événements "Lire"
+        document.querySelectorAll('.btn-read').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                const article = contentData.find(a => a.id === id);
+                if (article) openModal(article);
+            });
+        });
+        // Événements "Citer"
+        document.querySelectorAll('.btn-cite').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const title = btn.getAttribute('data-title');
+                const author = btn.getAttribute('data-author');
+                const doi = btn.getAttribute('data-doi');
+                alert(`Citation recommandée : ${author} (${doi.split('.')[2]?.slice(0,4) || '2026'}). « ${title} ». Mémoire Écrite, ${doi}.`);
+            });
+        });
+    }
+
+    function getIconForType(type) {
+        const icons = {
+            geographie: 'fa-map-marker-alt',
+            histoire: 'fa-landmark',
+            litterature: 'fa-book',
+            cinema: 'fa-film',
+            anthropologie: 'fa-hand-peace',
+            arts: 'fa-palette'
+        };
+        return icons[type] || 'fa-file';
+    }
+
+    function openModal(article) {
+        modalBody.innerHTML = `
+            <h2>${escapeHtml(article.title)}</h2>
+            <div><strong>${article.author}</strong> · ${article.year} · <span class="doi-badge">${article.doi}</span><br><span class="type-badge" style="margin-top:6px;">${article.typeLabel}</span></div>
+            <img src="${article.img}" style="width:100%; border-radius:0.5rem; margin:0.8rem 0; max-height:200px; object-fit:cover;" alt="">
+            <div>${article.fullContent}</div>
+            <button id="modalCiteBtn" style="margin-top:1rem; background:var(--surface-alt); border:none; padding:0.4rem 1rem; border-radius:var(--radius-btn); cursor:pointer;">📖 Citer l'article</button>
+        `;
+        modal.style.display = 'flex';
+        const citeModal = document.getElementById('modalCiteBtn');
+        if (citeModal) citeModal.onclick = () => alert(`Citer : ${article.author} (« ${article.title} »). Mémoire Écrite, ${article.doi}.`);
+    }
+
+    // Filtres par type
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentType = btn.getAttribute('data-type');
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderArticles();
+        });
+    });
+
+    // Recherche textuelle
+    searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        renderArticles();
+    });
+
+    // Menu mobile
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('open');
+    });
+
+    // Fermeture modale
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    renderArticles();
+</script>
+</body>
+</html>

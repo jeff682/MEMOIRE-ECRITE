@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mémoire Écrite · Recherche, littérature, cinéma</title>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ----- PALETTE MATES (héro vert forêt) ----- */
+        :root {
+            --bg-page: #F5F1EB;
+            --surface-white: #FFFFFF;
+            --surface-alt: #E7E1D6;
+            --hero-bg: #2A3B2C;
+            --hero-text: #FEF7E6;
+            --primary: #B87B4A;
+            --primary-dark: #8B5A2E;
+            --secondary: #6F8F6F;
+            --text-main: #2C2A27;
+            --text-muted: #6B6359;
+            --border-light: #DCD3C6;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            /* RAYONS RÉDUITS */
+            --radius-card: 0.75rem;      /* avant 1.5rem */
+            --radius-hero: 1rem;         /* avant 2rem */
+            --radius-btn: 1.5rem;        /* boutons arrondis mais modérés */
+            --radius-modal: 1rem;        /* avant 2rem */
+            --radius-input: 1.5rem;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER */
+        .site-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.9rem 0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            color: var(--primary);
+        }
+        .nav-menu {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover {
+            color: var(--primary-dark);
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.7rem;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem 0 0.5rem;
+            }
+            .nav-menu.open {
+                display: flex;
+            }
+        }
+
+        /* HERO - radius réduit */
+        .hero {
+            margin: 2rem 0 2rem;
+            background: var(--hero-bg);
+            color: var(--hero-text);
+            border-radius: var(--radius-hero);
+            padding: 2.5rem 1.8rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .hero p {
+            max-width: 700px;
+            margin: 1rem auto 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .hero .btn-hero {
+            display: inline-block;
+            margin-top: 1.8rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .hero .btn-hero:hover {
+            background: var(--primary-dark);
+        }
+
+        /* filtres */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            margin: 2rem 0 1.5rem;
+            align-items: center;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .search-input {
+            background: var(--surface-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-input);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .search-input input {
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            width: 200px;
+            outline: none;
+        }
+
+        /* grille cartes avec photo - radius réduit */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        @media (min-width: 640px) {
+            .articles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .articles-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .card {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .card-content {
+            padding: 1.4rem;
+            flex: 1;
+        }
+        .badge-type {
+            display: inline-block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            background: var(--surface-alt);
+            padding: 0.2rem 0.8rem;
+            border-radius: 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+        .card-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+            margin: 0.6rem 0;
+        }
+        .excerpt {
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+        .doi-badge {
+            font-family: monospace;
+            background: #F1EDE7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .card-footer {
+            padding: 0.8rem 1.4rem 1.2rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-read {
+            background: transparent;
+            border: none;
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-cite {
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* MODALE - radius réduit */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--surface-white);
+            max-width: 750px;
+            width: 90%;
+            max-height: 85vh;
+            border-radius: var(--radius-modal);
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .modal h2 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* FOOTER DÉTAILLÉ (pas de radius sur le footer lui-même, mais conservation) */
+        .site-footer {
+            background: #2A2A28;
+            color: #DCD3C6;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .footer-col h4 {
+            color: #E7DDD0;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .footer-col p, .footer-col a {
+            color: #B9B0A2;
+            text-decoration: none;
+            line-height: 1.6;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        .social-icons a {
+            font-size: 1.3rem;
+        }
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #4A4640;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* petite section API */
+        .api-card {
+            background: var(--surface-alt);
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+            .hero h1 { font-size: 1.6rem; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .search-input { width: 100%; }
+            .search-input input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-flex">
+        <div class="logo">Mémoire<span>Écrite</span></div>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="nav-menu" id="navMenu">
+            <a href="#" data-filter="all">Accueil</a>
+            <a href="#" data-filter="recherche">Recherche</a>
+            <a href="#" data-filter="litterature">Littérature</a>
+            <a href="#" data-filter="cinema">Cinéma</a>
+            <a href="#" id="submitLink">Soumettre</a>
+            <a href="#" id="aboutLink">À propos</a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <!-- HERO avec radius réduit -->
+    <div class="hero">
+        <h1>Mémoire vive, écriture savante</h1>
+        <p>Recherche, critique littéraire & cinéma – des contenus exigeants pour nourrir le débat intellectuel. Mémoire Écrite est une source ouverte et référencée.</p>
+        <a href="#" class="btn-hero" id="exploreBtn">Explorer les publications <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-buttons" id="filterButtons">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <button class="filter-btn" data-filter="recherche">🔬 Recherche</button>
+            <button class="filter-btn" data-filter="litterature">📖 Littérature</button>
+            <button class="filter-btn" data-filter="cinema">🎬 Cinéma</button>
+        </div>
+        <div class="search-input">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Titre, auteur...">
+        </div>
+    </div>
+
+    <div id="articlesContainer" class="articles-grid"></div>
+
+    <!-- Section API avec radius réduit -->
+    <div class="api-card">
+        <p><i class="fas fa-database"></i> <strong>Source pour agrégateurs</strong> — API REST, flux RSS, DOI, export BibTeX. Contenus sous licence CC BY-SA.</p>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Mémoire Écrite</h4>
+                <p>Revue savante et critique fondée en 2026. Nous publions des travaux inédits et des critiques de qualité sur les productions africaines et diasporiques.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liens utiles</h4>
+                <a href="#">Comité scientifique</a>
+                <a href="#">Soumettre un article</a>
+                <a href="#">Politique d’évaluation</a>
+                <a href="#">Indexation & API</a>
+                <a href="#">Mentions légales</a>
+            </div>
+            <div class="footer-col">
+                <h4>Suivez-nous</h4>
+                <div class="social-icons">
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Mastodon"><i class="fab fa-mastodon"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+                <p style="margin-top: 1rem;">contact@memoire-ecrite.org</p>
+                <p>Abidjan / Dakar / Paris</p>
+            </div>
+            <div class="footer-col">
+                <h4>Partenaires</h4>
+                <p>African Journals Online (AJOL)</p>
+                <p>OpenEdition</p>
+                <p>Crossref</p>
+                <p>Isidore</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2026 Mémoire Écrite — ISSN 2826-2345 (en ligne) — Licence Creative Commons BY-SA 4.0, sauf mention contraire.</p>
+            <p>Les contenus sont librement réutilisables avec attribution, favorisant la circulation des savoirs.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Modal -->
+<div id="articleModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    // Données des articles avec images
+    const articlesData = [
+        {
+            id: 1, type: "recherche", typeLabel: "📄 Recherche",
+            title: "Archives orales et écrites chez les Mossé : complémentarité des sources",
+            author: "K. Zongo", date: "12 mai 2026", doi: "10.5678/memoire.2026.03",
+            excerpt: "Croisement des récits oraux et des registres coloniaux pour renouveler l'histoire du Burkina Faso.",
+            fullContent: "<p>L’historiographie africaine a longtemps souffert d’une opposition factice entre oralité et écriture. À partir d’un corpus inédit de récits royaux mossé et d’archives coloniales, l’auteur montre leur complémentarité.</p><p><strong>Mots-clés :</strong> Burkina Faso, sources orales, archives coloniales.</p>",
+            img: "https://picsum.photos/id/104/400/240"
+        },
+        {
+            id: 2, type: "litterature", typeLabel: "✍️ Littérature",
+            title: "« Le Devoir de violence » de Yambo Ouologuem : relecture 50 ans après",
+            author: "F. Adjovi", date: "2 avril 2026", doi: "10.5678/memoire.2026.11",
+            excerpt: "Entre polémique et modernité, l’œuvre fondatrice de la littérature africaine francophone est-elle un manifeste décolonial ?",
+            fullContent: "<p>Analyse de la réception du prix Renaudot 1968, de l’intertextualité et de la portée politique. Ouologuem déconstruit l’authenticité obligée.</p>",
+            img: "https://picsum.photos/id/20/400/240"
+        },
+        {
+            id: 3, type: "cinema", typeLabel: "🎬 Cinéma",
+            title: "« Banel & Adama » : l’intime et le politique dans le Sahel",
+            author: "M. Diallo", date: "25 mars 2026", doi: "10.5678/memoire.2026.15",
+            excerpt: "Analyse du film de Ramata-Toulaye Sy : genre, traditions et désir féminin.",
+            fullContent: "<p>Banel & Adama transcende le récit villageois. Esthétique ocre, silences, et place des femmes réalisatrices.</p>",
+            img: "https://picsum.photos/id/96/400/240"
+        },
+        {
+            id: 4, type: "recherche", typeLabel: "📄 Recherche",
+            title: "Cartographie numérique des manuscrits de Tombouctou (XVe-XVIIIe)",
+            author: "S. Traoré, I. Ag Ali", date: "14 février 2026", doi: "10.5678/memoire.2026.22",
+            excerpt: "Base de données géolocalisée de 2 300 manuscrits, réseaux savants transsahariens.",
+            fullContent: "<p>Cartographie des échanges entre Tombouctou, Maroc et Égypte. Une ressource clé.</p>",
+            img: "https://picsum.photos/id/119/400/240"
+        },
+        {
+            id: 5, type: "litterature", typeLabel: "✍️ Littérature",
+            title: "« La mémoire de l’eau » de Khadi Hane : écrire l’exil",
+            author: "A. Ndiaye", date: "3 janvier 2026", doi: "10.5678/memoire.2026.30",
+            excerpt: "Poétique des ruines et renaissance par la transmission orale.",
+            fullContent: "<p>Khadi Hane tisse une narration de l’exil et de la résilience féminine.</p>",
+            img: "https://picsum.photos/id/147/400/240"
+        },
+        {
+            id: 6, type: "cinema", typeLabel: "🎬 Cinéma",
+            title: "L’afrofuturisme dans « Neptune Frost » : technologie et décolonialité",
+            author: "J. Kourouma", date: "20 novembre 2025", doi: "10.5678/memoire.2025.45",
+            excerpt: "Analyse du film musical rwandais, intersection de la SF et des luttes sociales.",
+            fullContent: "<p>Neptune Frost utilise l’esthétique cyberpunk pour interroger l’extraction minière et les identités.</p>",
+            img: "https://picsum.photos/id/0/400/240"
+        }
+    ];
+
+    const container = document.getElementById('articlesContainer');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const searchInput = document.getElementById('searchInput');
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    const modal = document.getElementById('articleModal');
+    const modalBody = document.getElementById('modalBody');
+    const closeModalSpan = document.querySelector('.close-modal');
+
+    function renderArticles() {
+        let filtered = articlesData.filter(article => {
+            if (currentFilter !== 'all' && article.type !== currentFilter) return false;
+            if (currentSearch.trim()) {
+                const haystack = (article.title + ' ' + article.author + ' ' + article.excerpt).toLowerCase();
+                return haystack.includes(currentSearch.toLowerCase());
+            }
+            return true;
+        });
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Aucune publication trouvée.</div>`;
+            return;
+        }
+        container.innerHTML = filtered.map(article => `
+            <div class="card">
+                <img class="card-img" src="${article.img}" alt="Illustration ${article.title}" loading="lazy">
+                <div class="card-content">
+                    <span class="badge-type">${article.typeLabel}</span>
+                    <h3>${escapeHtml(article.title)}</h3>
+                    <div class="card-meta"><span><i class="fas fa-user-pen"></i> ${escapeHtml(article.author)}</span> <span><i class="far fa-calendar-alt"></i> ${article.date}</span></div>
+                    <p class="excerpt">${escapeHtml(article.excerpt)}</p>
+                    <div class="doi-badge"><i class="fas fa-fingerprint"></i> ${article.doi}</div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn-read" data-id="${article.id}"><i class="fas fa-book-open"></i> Lire</button>
+                    <button class="btn-cite" data-id="${article.id}" data-doi="${article.doi}" data-title="${escapeHtml(article.title)}" data-author="${escapeHtml(article.author)}"><i class="fas fa-quote-right"></i> Citer</button>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.btn-read').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.dataset.id);
+                const article = articlesData.find(a => a.id === id);
+                if (article) openModal(article);
+            });
+        });
+        document.querySelectorAll('.btn-cite').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const title = btn.dataset.title;
+                const author = btn.dataset.author;
+                const doi = btn.dataset.doi;
+                alert(`Citation : ${author} (2026). « ${title} ». Mémoire Écrite, ${doi}.`);
+            });
+        });
+    }
+
+    function openModal(article) {
+        modalBody.innerHTML = `
+            <h2>${escapeHtml(article.title)}</h2>
+            <div class="modal-meta"><strong>${article.author}</strong> · ${article.date} · <span class="doi-badge">${article.doi}</span><br><span class="badge-type">${article.typeLabel}</span></div>
+            <img src="${article.img}" style="width:100%; border-radius:0.5rem; margin:1rem 0; max-height:300px; object-fit:cover;" alt="illustration">
+            <div>${article.fullContent}</div>
+            <button id="modalCiteBtn" style="margin-top:1rem; background:var(--surface-alt); border:none; padding:0.5rem 1rem; border-radius:var(--radius-btn); cursor:pointer;">📖 Citer l'article</button>
+        `;
+        modal.style.display = 'flex';
+        document.getElementById('modalCiteBtn')?.addEventListener('click', () => {
+            alert(`Citer : ${article.author} (« ${article.title} »). Mémoire Écrite, ${article.doi}.`);
+        });
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentFilter = btn.dataset.filter;
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderArticles();
+        });
+    });
+    searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        renderArticles();
+    });
+
+    document.getElementById('menuToggle')?.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('open');
+    });
+    document.getElementById('exploreBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth' });
+    });
+    document.getElementById('submitLink')?.addEventListener('click', (e) => {
+        e.preventDefault(); alert("📝 Soumission d'article : envoyez votre manuscrit à soumission@memoire-ecrite.org (évaluation par les pairs).");
+    });
+    document.getElementById('aboutLink')?.addEventListener('click', (e) => {
+        e.preventDefault(); alert("Mémoire Écrite – revue à comité de lecture. Nous visons l'excellence et la diffusion libre des savoirs critiques africains.");
+    });
+    closeModalSpan.onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+    renderArticles();
+</script>
+</body>
+</html>

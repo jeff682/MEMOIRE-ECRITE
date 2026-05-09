@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mémoire Écrite · Soumettre un article</title>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-page: #F5F1EB;
+            --surface-white: #FFFFFF;
+            --surface-alt: #E7E1D6;
+            --hero-bg: #2A3B2C;
+            --hero-text: #FEF7E6;
+            --primary: #B87B4A;
+            --primary-dark: #8B5A2E;
+            --secondary: #6F8F6F;
+            --text-main: #2C2A27;
+            --text-muted: #6B6359;
+            --border-light: #DCD3C6;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --radius-card: 0.75rem;
+            --radius-hero: 1rem;
+            --radius-btn: 1.5rem;
+            --radius-input: 1.5rem;
+            --error: #c0392b;
+            --success: #2e7d32;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER */
+        .site-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.9rem 0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            color: var(--primary);
+        }
+        .nav-menu {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary);
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.7rem;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem 0 0.5rem;
+            }
+            .nav-menu.open {
+                display: flex;
+            }
+        }
+
+        /* HERO */
+        .hero {
+            margin: 2rem 0 1.5rem;
+            background: var(--hero-bg);
+            color: var(--hero-text);
+            border-radius: var(--radius-hero);
+            padding: 2rem 1.8rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .hero p {
+            max-width: 700px;
+            margin: 0.5rem auto 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* FORMULAIRE */
+        .form-container {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            padding: 2rem;
+            margin: 1rem 0 2rem;
+            box-shadow: var(--shadow);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+        .form-group label .required {
+            color: var(--error);
+            margin-left: 0.2rem;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            background: var(--bg-page);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-input);
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border 0.2s;
+            outline: none;
+        }
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(184, 123, 74, 0.2);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .file-area {
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            text-align: center;
+            background: var(--bg-page);
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+        .file-area:hover {
+            border-color: var(--primary);
+        }
+        .file-area i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .file-area p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        #fileInfo {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--primary-dark);
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.3rem;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+        .error-msg {
+            color: var(--error);
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-reset:hover {
+            background: var(--surface-alt);
+        }
+        .info-box {
+            background: var(--surface-alt);
+            border-radius: var(--radius-card);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* FOOTER */
+        .site-footer {
+            background: #2A2A28;
+            color: #DCD3C6;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-col h4 {
+            color: #E7DDD0;
+            margin-bottom: 0.5rem;
+        }
+        .footer-col p, .footer-col a {
+            color: #B9B0A2;
+            text-decoration: none;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+        .social-icons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #4A4640;
+            padding-top: 1rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 780px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-flex">
+        <div class="logo">Mémoire<span>Écrite</span></div>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="nav-menu" id="navMenu">
+            <a href="#">Accueil</a>
+            <a href="#">Recherche</a>
+            <a href="#">Contenus</a>
+            <a href="#">Littérature</a>
+            <a href="#">Cinéma</a>
+            <a href="#" class="active">Soumettre</a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="hero">
+        <h1><i class="fas fa-upload"></i> Soumettre une publication</h1>
+        <p>Partagez vos résultats de recherche, critiques littéraires ou analyses cinématographiques. Tous les textes sont évalués par le comité scientifique et reçoivent un DOI.</p>
+    </div>
+
+    <div class="form-container">
+        <form id="submissionForm">
+            <div class="form-grid">
+                <!-- Type de contenu -->
+                <div class="form-group">
+                    <label>Type de publication <span class="required">*</span></label>
+                    <select id="contentType" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="recherche">Résultat de recherche</option>
+                        <option value="litterature">Critique littéraire</option>
+                        <option value="cinema">Critique cinématographique</option>
+                    </select>
+                </div>
+                <!-- Discipline (pour recherche) -->
+                <div class="form-group" id="disciplineGroup" style="display:none;">
+                    <label>Discipline <span class="required">*</span></label>
+                    <select id="discipline">
+                        <option value="">Sélectionnez</option>
+                        <option value="histoire">Histoire</option>
+                        <option value="anthropologie">Anthropologie</option>
+                        <option value="geographie">Géographie</option>
+                        <option value="sociologie">Sociologie</option>
+                        <option value="litterature">Études littéraires</option>
+                        <option value="cinema">Cinéma & médias</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <!-- Titre -->
+                <div class="form-group full-width">
+                    <label>Titre de l'article <span class="required">*</span></label>
+                    <input type="text" id="title" required placeholder="Ex: Archives orales et écrites chez les Mossé">
+                </div>
+                <!-- Auteur -->
+                <div class="form-group">
+                    <label>Auteur·ice <span class="required">*</span></label>
+                    <input type="text" id="author" required placeholder="Nom et prénom">
+                </div>
+                <!-- Affiliation -->
+                <div class="form-group">
+                    <label>Affiliation (université, institution)</label>
+                    <input type="text" id="affiliation" placeholder="Ex: Université Gaston Berger, Saint-Louis">
+                </div>
+                <!-- Email -->
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" id="email" required placeholder="auteur@exemple.org">
+                </div>
+                <!-- Année -->
+                <div class="form-group">
+                    <label>Année de soumission</label>
+                    <input type="number" id="year" value="2026" readonly style="background:#EBE5DD;">
+                </div>
+                <!-- Résumé -->
+                <div class="form-group full-width">
+                    <label>Résumé / abstract <span class="required">*</span></label>
+                    <textarea id="abstract" required placeholder="Résumez votre contribution en 150-200 mots. Ce texte sera public."></textarea>
+                </div>
+                <!-- Mots-clés -->
+                <div class="form-group full-width">
+                    <label>Mots-clés (séparés par des virgules)</label>
+                    <input type="text" id="keywords" placeholder="Ex: oralité, postcolonial, archives, Sénégal">
+                </div>
+                <!-- Fichier (simulation) -->
+                <div class="form-group full-width">
+                    <label>Fichier (PDF, DOCX) <span class="required">*</span></label>
+                    <div class="file-area" id="fileArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Cliquez ou glissez votre fichier ici</p>
+                        <input type="file" id="fileInput" accept=".pdf,.docx" style="display:none;">
+                    </div>
+                    <div id="fileInfo"></div>
+                </div>
+                <!-- DOI (optionnel) -->
+                <div class="form-group">
+                    <label>DOI (si déjà attribué)</label>
+                    <input type="text" id="doi" placeholder="10.xxxx/xxxx">
+                </div>
+                <!-- Licence -->
+                <div class="form-group">
+                    <label>Licence de publication <span class="required">*</span></label>
+                    <select id="license" required>
+                        <option value="CC BY-SA 4.0">CC BY-SA 4.0 (Recommandée)</option>
+                        <option value="CC BY-NC-ND 4.0">CC BY-NC-ND 4.0</option>
+                        <option value="CC0">Domaine public (CC0)</option>
+                    </select>
+                </div>
+                <!-- Déclarations -->
+                <div class="form-group full-width">
+                    <label>Déclarations</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="originalWork" required> Je certifie que ce travail est original et n'a pas été publié ailleurs <span class="required">*</span></label>
+                        <label><input type="checkbox" id="rights"> Je détiens les droits sur les éventuelles images/illustrations incluses</label>
+                        <label><input type="checkbox" id="preprint"> J'accepte que le manuscrit soit déposé en preprint si accepté</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-reset" id="resetBtn"><i class="fas fa-undo"></i> Réinitialiser</button>
+                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Envoyer la soumission</button>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> Les articles sont évalués en double aveugle. Vous recevrez une réponse sous 6 semaines. Les manuscrits acceptés bénéficient d’un DOI et d’une mise en ligne en libre accès.
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Mémoire Écrite</h4>
+                <p>Revue savante et critique – publication en libre accès. Tous les contenus sont évalués par les pairs.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liens utiles</h4>
+                <a href="#">Comité scientifique</a>
+                <a href="#">Guide pour les auteurs</a>
+                <a href="#">Politique éditoriale</a>
+                <a href="#">Mentions légales</a>
+            </div>
+            <div class="footer-col">
+                <h4>Suivez-nous</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-mastodon"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+                <p>soumission@memoire-ecrite.org</p>
+                <p>Dakar / Abidjan / Paris</p>
+            </div>
+            <div class="footer-col">
+                <h4>Partenaires</h4>
+                <p>African Journals Online</p>
+                <p>OpenEdition</p>
+                <p>Crossref</p>
+                <p>Isidore</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2026 Mémoire Écrite — ISSN 2826-2345 — Contenus sous licence Creative Commons</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Gestion affichage discipline selon type
+    const contentTypeSelect = document.getElementById('contentType');
+    const disciplineGroup = document.getElementById('disciplineGroup');
+    const disciplineSelect = document.getElementById('discipline');
+
+    contentTypeSelect.addEventListener('change', function() {
+        if (this.value === 'recherche') {
+            disciplineGroup.style.display = 'block';
+            disciplineSelect.required = true;
+        } else {
+            disciplineGroup.style.display = 'none';
+            disciplineSelect.required = false;
+            disciplineSelect.value = '';
+        }
+    });
+
+    // Gestion du fichier (simulation)
+    const fileArea = document.getElementById('fileArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+
+    fileArea.addEventListener('click', () => fileInput.click());
+    fileArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileArea.style.borderColor = 'var(--primary)';
+    });
+    fileArea.addEventListener('dragleave', () => {
+        fileArea.style.borderColor = 'var(--border-light)';
+    });
+    fileArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            updateFileInfo(files[0]);
+        }
+        fileArea.style.borderColor = 'var(--border-light)';
+    });
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) updateFileInfo(fileInput.files[0]);
+        else fileInfo.innerHTML = '';
+    });
+
+    function updateFileInfo(file) {
+        if (file && (file.type === 'application/pdf' || file.name.endsWith('.docx'))) {
+            fileInfo.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> ${file.name} (${(file.size/1024).toFixed(1)} Ko)`;
+            fileInfo.style.color = 'var(--success)';
+        } else {
+            fileInfo.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Format non supporté. Veuillez uploader un PDF ou DOCX.`;
+            fileInfo.style.color = 'var(--error)';
+        }
+    }
+
+    // Validation avant soumission
+    const form = document.getElementById('submissionForm');
+    const resetBtn = document.getElementById('resetBtn');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let isValid = true;
+        const requiredFields = ['contentType', 'title', 'author', 'email', 'abstract'];
+        for (let id of requiredFields) {
+            const field = document.getElementById(id);
+            if (!field.value.trim()) {
+                field.style.borderColor = 'var(--error)';
+                isValid = false;
+                showTemporaryError(field, 'Ce champ est requis');
+            } else {
+                field.style.borderColor = '';
+            }
+        }
+        // Validation email
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+            document.getElementById('email').style.borderColor = 'var(--error)';
+            showTemporaryError(document.getElementById('email'), 'Email invalide');
+            isValid = false;
+        }
+        // Validation fichier
+        if (!fileInput.files.length) {
+            fileArea.style.borderColor = 'var(--error)';
+            isValid = false;
+            alert('Veuillez joindre votre fichier (PDF ou DOCX).');
+        } else {
+            fileArea.style.borderColor = '';
+        }
+        // Validation checkbox originale
+        const originalCheck = document.getElementById('originalWork');
+        if (!originalCheck.checked) {
+            originalCheck.style.outline = '1px solid var(--error)';
+            isValid = false;
+            alert('Vous devez certifier que le travail est original.');
+        } else {
+            originalCheck.style.outline = '';
+        }
+        // Si recherche, discipline requise
+        if (contentTypeSelect.value === 'recherche' && !disciplineSelect.value) {
+            disciplineSelect.style.borderColor = 'var(--error)';
+            isValid = false;
+            alert('Veuillez sélectionner une discipline pour les résultats de recherche.');
+        } else {
+            disciplineSelect.style.borderColor = '';
+        }
+
+        if (isValid) {
+            // Simulation d'envoi
+            alert(`✅ Votre soumission "${document.getElementById('title').value}" a bien été enregistrée.\nUn email de confirmation a été envoyé à ${email}.\nNotre comité d'évaluation vous répondra sous 6 semaines.`);
+            form.reset();
+            fileInput.value = '';
+            fileInfo.innerHTML = '';
+            contentTypeSelect.dispatchEvent(new Event('change'));
+            // Réinitialiser les styles
+            document.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '');
+            originalCheck.checked = false;
+        } else {
+            alert('Veuillez corriger les erreurs dans le formulaire.');
+        }
+    });
+
+    function showTemporaryError(field, message) {
+        let errDiv = field.parentElement.querySelector('.error-msg');
+        if (!errDiv) {
+            errDiv = document.createElement('div');
+            errDiv.className = 'error-msg';
+            field.parentElement.appendChild(errDiv);
+        }
+        errDiv.textContent = message;
+        setTimeout(() => errDiv.remove(), 3000);
+    }
+
+    resetBtn.addEventListener('click', () => {
+        if (confirm('Réinitialiser tous les champs ? Les données non sauvegardées seront perdues.')) {
+            form.reset();
+            fileInput.value = '';
+            fileInfo.innerHTML = '';
+            contentTypeSelect.dispatchEvent(new Event('change'));
+            document.querySelectorAll('.error-msg').forEach(e => e.remove());
+            document.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '');
+        }
+    });
+
+    // Menu mobile
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('open');
+    });
+
+    // Petite initialisation
+    contentTypeSelect.dispatchEvent(new Event('change'));
+</script>
+</body>
+</html>

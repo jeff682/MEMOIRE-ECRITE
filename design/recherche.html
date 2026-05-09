@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mémoire Écrite · Recherche avancée</title>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-page: #F5F1EB;
+            --surface-white: #FFFFFF;
+            --surface-alt: #E7E1D6;
+            --hero-bg: #2A3B2C;
+            --hero-text: #FEF7E6;
+            --primary: #B87B4A;
+            --primary-dark: #8B5A2E;
+            --secondary: #6F8F6F;
+            --text-main: #2C2A27;
+            --text-muted: #6B6359;
+            --border-light: #DCD3C6;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --radius-card: 0.75rem;
+            --radius-hero: 1rem;
+            --radius-btn: 1.5rem;
+            --radius-modal: 1rem;
+            --radius-input: 1.5rem;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER */
+        .site-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.9rem 0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            color: var(--primary);
+        }
+        .nav-menu {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary);
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.7rem;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem 0 0.5rem;
+            }
+            .nav-menu.open {
+                display: flex;
+            }
+        }
+
+        /* HERO spécifique recherche */
+        .hero {
+            margin: 2rem 0 1.5rem;
+            background: var(--hero-bg);
+            color: var(--hero-text);
+            border-radius: var(--radius-hero);
+            padding: 2rem 1.8rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .hero p {
+            max-width: 700px;
+            margin: 0.5rem auto 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* PANEL DE FILTRES (recherche fine) */
+        .filters-panel {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .filter-group {
+            margin-bottom: 1.2rem;
+        }
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        select, input[type="text"], input[type="date"] {
+            background: var(--bg-page);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-btn);
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            width: 100%;
+            max-width: 250px;
+            outline: none;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.3rem;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+        .btn-search {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-search:hover {
+            background: var(--primary-dark);
+        }
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+        }
+
+        /* Résultats */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin: 1.5rem 0 1rem;
+        }
+        .articles-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        @media (min-width: 640px) {
+            .articles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .articles-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .card {
+            background: var(--surface-white);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        .card-img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.2rem;
+            flex: 1;
+        }
+        .badge-type {
+            display: inline-block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            background: var(--surface-alt);
+            padding: 0.2rem 0.7rem;
+            border-radius: 1rem;
+            margin-bottom: 0.6rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .excerpt {
+            font-size: 0.85rem;
+            margin-bottom: 0.6rem;
+        }
+        .doi-badge {
+            font-family: monospace;
+            background: #F1EDE7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .card-footer {
+            padding: 0.7rem 1.2rem 1rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-read {
+            background: transparent;
+            border: none;
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .site-footer {
+            background: #2A2A28;
+            color: #DCD3C6;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-col h4 {
+            color: #E7DDD0;
+            margin-bottom: 0.5rem;
+        }
+        .footer-col a {
+            color: #B9B0A2;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .social-icons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #4A4640;
+            padding-top: 1rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 650px) {
+            .filter-row { flex-direction: column; align-items: stretch; }
+            select, input { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-flex">
+        <div class="logo">Mémoire<span>Écrite</span></div>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="nav-menu" id="navMenu">
+            <a href="#">Accueil</a>
+            <a href="#">Recherche</a>
+            <a href="#">Littérature</a>
+            <a href="#">Cinéma</a>
+            <a href="#" class="active">Recherche avancée</a>
+            <a href="#">Soumettre</a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="hero">
+        <h1><i class="fas fa-search"></i> Recherche fine</h1>
+        <p>Affinez votre exploration parmi plus de 120 publications scientifiques, critiques littéraires et analyses cinématographiques.</p>
+    </div>
+
+    <!-- Panneau de filtres avancés -->
+    <div class="filters-panel">
+        <div class="filter-group">
+            <label>🔍 Mot-clé / auteur / titre</label>
+            <input type="text" id="keyword" placeholder="Ex: mémoire, oralité, Sembène..." style="max-width:100%;">
+        </div>
+        <div class="filter-row">
+            <div style="flex:1">
+                <label>📂 Type de contenu</label>
+                <select id="typeFilter">
+                    <option value="all">Tous</option>
+                    <option value="recherche">Résultat de recherche</option>
+                    <option value="litterature">Critique littéraire</option>
+                    <option value="cinema">Critique cinéma</option>
+                </select>
+            </div>
+            <div style="flex:1">
+                <label>🏷️ Discipline (pour recherche)</label>
+                <select id="disciplineFilter">
+                    <option value="all">Toutes</option>
+                    <option value="histoire">Histoire</option>
+                    <option value="anthropologie">Anthropologie</option>
+                    <option value="litterature">Études littéraires</option>
+                    <option value="cinema">Cinéma & médias</option>
+                    <option value="sociologie">Sociologie</option>
+                </select>
+            </div>
+            <div style="flex:1">
+                <label>📅 Année de publication</label>
+                <select id="yearFilter">
+                    <option value="all">Toutes</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div style="flex:1">
+                <label>👤 Auteur·ice</label>
+                <input type="text" id="authorFilter" placeholder="Nom de l'auteur">
+            </div>
+        </div>
+        <div class="filter-group">
+            <label>🏷️ Mots-clés (sélection multiple)</label>
+            <div class="checkbox-group" id="keywordsGroup">
+                <label><input type="checkbox" value="oralité"> oralité</label>
+                <label><input type="checkbox" value="postcolonial"> postcolonial</label>
+                <label><input type="checkbox" value="féminisme"> féminisme</label>
+                <label><input type="checkbox" value="afrofuturisme"> afrofuturisme</label>
+                <label><input type="checkbox" value="colonial"> colonial</label>
+                <label><input type="checkbox" value="migration"> migration</label>
+                <label><input type="checkbox" value="cinéma"> cinéma</label>
+                <label><input type="checkbox" value="manuscrit"> manuscrit</label>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+            <button class="btn-search" id="searchBtn"><i class="fas fa-filter"></i> Appliquer les filtres</button>
+            <button class="btn-reset" id="resetBtn"><i class="fas fa-undo-alt"></i> Réinitialiser</button>
+        </div>
+    </div>
+
+    <div class="results-header">
+        <h2><span id="resultCount">0</span> résultat(s)</h2>
+        <small><i class="fas fa-database"></i> Données en accès libre · DOI pérennes</small>
+    </div>
+    <div id="articlesContainer" class="articles-grid"></div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Mémoire Écrite</h4>
+                <p>Revue savante et critique – recherche avancée sur plus de 120 publications.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liens</h4>
+                <a href="#">Comité scientifique</a>
+                <a href="#">API & métadonnées</a>
+                <a href="#">Politique d'évaluation</a>
+            </div>
+            <div class="footer-col">
+                <h4>Suivre</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-mastodon"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <p>search@memoire-ecrite.org</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2026 Mémoire Écrite — ISSN 2826-2345 — Contenus sous licence CC BY-SA 4.0</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Modal pour lire l'article -->
+<div id="articleModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background: var(--surface-white); max-width:700px; width:90%; max-height:85vh; border-radius:var(--radius-modal); padding:1.5rem; overflow:auto; position:relative;">
+        <span id="closeModal" style="position:absolute; top:0.8rem; right:1.2rem; font-size:1.8rem; cursor:pointer;">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    // --- BASE DE DONNÉES ÉTENDUE (recherche, littérature, cinéma) ---
+    const articlesData = [
+        // recherche
+        { id: 1, type: "recherche", discipline: "histoire", title: "Archives orales et écrites chez les Mossé", author: "K. Zongo", year: 2026, doi: "10.5678/memoire.2026.03", excerpt: "Croisement des récits oraux et des archives coloniales.", fullContent: "<p>Article complet sur l'historiographie mossé...</p>", img: "https://picsum.photos/id/104/400/240", keywords: ["oralité", "colonial"] },
+        { id: 2, type: "recherche", discipline: "anthropologie", title: "Rituels de deuil chez les Sérères", author: "F. Diouf", year: 2026, doi: "10.5678/memoire.2026.07", excerpt: "Enquête ethnographique sur les pratiques funéraires.", fullContent: "<p>Adaptation des rituels à l'urbanisation...</p>", img: "https://picsum.photos/id/108/400/240", keywords: ["oralité", "migration"] },
+        { id: 3, type: "recherche", discipline: "litterature", title: "Écriture migrante et créolisation", author: "L. M'Bareck", year: 2026, doi: "10.5678/memoire.2026.12", excerpt: "Analyse comparée de romanciers francophones.", fullContent: "<p>Étude postcoloniale...</p>", img: "https://picsum.photos/id/20/400/240", keywords: ["postcolonial", "migration"] },
+        { id: 4, type: "recherche", discipline: "cinema", title: "Festivals de cinéma en Afrique de l'Ouest", author: "R. Konaté", year: 2026, doi: "10.5678/memoire.2026.18", excerpt: "Émergence de festivals indépendants.", fullContent: "<p>Cartographie et économie des festivals...</p>", img: "https://picsum.photos/id/96/400/240", keywords: ["cinéma"] },
+        { id: 5, type: "recherche", discipline: "histoire", title: "Cités-États haoussa", author: "A. Mahamadou", year: 2025, doi: "10.5678/memoire.2025.25", excerpt: "Nouvelles approches archéologiques.", fullContent: "<p>Fouilles à Kano et Katsina...</p>", img: "https://picsum.photos/id/118/400/240", keywords: ["manuscrit", "colonial"] },
+        { id: 6, type: "litterature", discipline: "litterature", title: "Le Devoir de violence : relecture", author: "F. Adjovi", year: 2026, doi: "10.5678/memoire.2026.11", excerpt: "Yambo Ouologuem et le manifeste décolonial.", fullContent: "<p>Analyse critique de l'œuvre...</p>", img: "https://picsum.photos/id/20/400/240", keywords: ["postcolonial", "colonial"] },
+        { id: 7, type: "litterature", discipline: "litterature", title: "Khadi Hane : mémoire de l'eau", author: "A. Ndiaye", year: 2026, doi: "10.5678/memoire.2026.30", excerpt: "Exil et résilience féminine.", fullContent: "<p>Poétique des ruines...</p>", img: "https://picsum.photos/id/147/400/240", keywords: ["migration", "féminisme"] },
+        { id: 8, type: "cinema", discipline: "cinema", title: "Banel & Adama : l'intime politique", author: "M. Diallo", year: 2026, doi: "10.5678/memoire.2026.15", excerpt: "Genre et tradition dans le film de Ramata-Toulaye Sy.", fullContent: "<p>Analyse esthétique et féministe...</p>", img: "https://picsum.photos/id/96/400/240", keywords: ["féminisme", "cinéma"] },
+        { id: 9, type: "cinema", discipline: "cinema", title: "Neptune Frost et l'afrofuturisme", author: "J. Kourouma", year: 2025, doi: "10.5678/memoire.2025.45", excerpt: "Technologie et décolonialité.", fullContent: "<p>Analyse du film rwandais...</p>", img: "https://picsum.photos/id/0/400/240", keywords: ["afrofuturisme", "cinéma"] },
+        { id: 10, type: "recherche", discipline: "sociologie", title: "Parenté à plaisanterie en milieu peul", author: "S. Ba", year: 2025, doi: "10.5678/memoire.2025.30", excerpt: "Cohésion sociale et numérique.", fullContent: "<p>Étude des sanakuyya...</p>", img: "https://picsum.photos/id/127/400/240", keywords: ["oralité", "postcolonial"] }
+    ];
+
+    // Références DOM
+    const container = document.getElementById('articlesContainer');
+    const keywordInput = document.getElementById('keyword');
+    const typeSelect = document.getElementById('typeFilter');
+    const disciplineSelect = document.getElementById('disciplineFilter');
+    const yearSelect = document.getElementById('yearFilter');
+    const authorInput = document.getElementById('authorFilter');
+    const keywordsCheckboxes = document.querySelectorAll('#keywordsGroup input[type="checkbox"]');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultCountSpan = document.getElementById('resultCount');
+
+    const modal = document.getElementById('articleModal');
+    const modalBody = document.getElementById('modalBody');
+    const closeModal = document.getElementById('closeModal');
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function getSelectedKeywords() {
+        let selected = [];
+        keywordsCheckboxes.forEach(cb => {
+            if (cb.checked) selected.push(cb.value);
+        });
+        return selected;
+    }
+
+    function filterArticles() {
+        let keyword = keywordInput.value.trim().toLowerCase();
+        let type = typeSelect.value;
+        let discipline = disciplineSelect.value;
+        let year = yearSelect.value;
+        let author = authorInput.value.trim().toLowerCase();
+        let selectedKeywords = getSelectedKeywords();
+
+        const filtered = articlesData.filter(article => {
+            // Keyword général
+            if (keyword && !(article.title.toLowerCase().includes(keyword) || article.author.toLowerCase().includes(keyword) || article.excerpt.toLowerCase().includes(keyword))) return false;
+            // Type
+            if (type !== 'all' && article.type !== type) return false;
+            // Discipline (pour les recherches, mais applicable aussi aux autres types où discipline = type littérature/cinéma)
+            if (discipline !== 'all') {
+                if (article.type === 'recherche' && article.discipline !== discipline) return false;
+                if (article.type === 'litterature' && discipline !== 'litterature') return false;
+                if (article.type === 'cinema' && discipline !== 'cinema') return false;
+            }
+            // Année
+            if (year !== 'all' && article.year != year) return false;
+            // Auteur
+            if (author && !article.author.toLowerCase().includes(author)) return false;
+            // Mots-clés : au moins un des mots-clés sélectionnés doit être présent
+            if (selectedKeywords.length > 0) {
+                let hasKeyword = false;
+                for (let kw of selectedKeywords) {
+                    if (article.keywords.includes(kw)) { hasKeyword = true; break; }
+                }
+                if (!hasKeyword) return false;
+            }
+            return true;
+        });
+        renderResults(filtered);
+    }
+
+    function renderResults(articles) {
+        resultCountSpan.innerText = articles.length;
+        if (articles.length === 0) {
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Aucun article ne correspond à vos critères. Essayez d’élargir la recherche.</div>`;
+            return;
+        }
+        container.innerHTML = articles.map(article => {
+            let typeLabel = "";
+            if (article.type === 'recherche') typeLabel = "📄 Recherche";
+            else if (article.type === 'litterature') typeLabel = "✍️ Littérature";
+            else typeLabel = "🎬 Cinéma";
+            return `
+                <div class="card">
+                    <img class="card-img" src="${article.img}" alt="" loading="lazy">
+                    <div class="card-content">
+                        <span class="badge-type">${typeLabel}</span>
+                        <h3>${escapeHtml(article.title)}</h3>
+                        <div class="card-meta"><span><i class="fas fa-user"></i> ${escapeHtml(article.author)}</span> <span>${article.year}</span></div>
+                        <p class="excerpt">${escapeHtml(article.excerpt)}</p>
+                        <div class="doi-badge">DOI: ${article.doi}</div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-read" data-id="${article.id}"><i class="fas fa-book-open"></i> Lire</button>
+                        <button class="btn-cite" data-doi="${article.doi}" data-title="${escapeHtml(article.title)}" data-author="${escapeHtml(article.author)}"><i class="fas fa-quote-right"></i> Citer</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Attacher événements "Lire"
+        document.querySelectorAll('.btn-read').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                const article = articlesData.find(a => a.id === id);
+                if (article) openModal(article);
+            });
+        });
+        // Attacher événements "Citer"
+        document.querySelectorAll('.btn-cite').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const title = btn.getAttribute('data-title');
+                const author = btn.getAttribute('data-author');
+                const doi = btn.getAttribute('data-doi');
+                alert(`Citation recommandée : ${author} (${doi.split('.')[2]?.slice(0,4) || '2026'}). « ${title} ». Mémoire Écrite, ${doi}.`);
+            });
+        });
+    }
+
+    function openModal(article) {
+        modalBody.innerHTML = `
+            <h2>${escapeHtml(article.title)}</h2>
+            <div><strong>${article.author}</strong> · ${article.year} · <span class="doi-badge">${article.doi}</span></div>
+            <img src="${article.img}" style="width:100%; border-radius:0.5rem; margin:0.8rem 0; max-height:200px; object-fit:cover;" alt="">
+            <div>${article.fullContent}</div>
+            <button id="modalCiteBtn" style="margin-top:1rem; background:var(--surface-alt); border:none; padding:0.4rem 1rem; border-radius:var(--radius-btn); cursor:pointer;">📖 Citer l'article</button>
+        `;
+        modal.style.display = 'flex';
+        const citeModal = document.getElementById('modalCiteBtn');
+        if (citeModal) citeModal.onclick = () => alert(`Citer : ${article.author} (« ${article.title} »). Mémoire Écrite, ${article.doi}.`);
+    }
+
+    function resetFilters() {
+        keywordInput.value = '';
+        typeSelect.value = 'all';
+        disciplineSelect.value = 'all';
+        yearSelect.value = 'all';
+        authorInput.value = '';
+        keywordsCheckboxes.forEach(cb => cb.checked = false);
+        filterArticles();
+    }
+
+    searchBtn.addEventListener('click', filterArticles);
+    resetBtn.addEventListener('click', resetFilters);
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    // Navigation mobile
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('navMenu').classList.toggle('open');
+    });
+
+    // Initialisation
+    filterArticles();
+</script>
+</body>
+</html>
