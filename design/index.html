@@ -51,6 +51,7 @@
         /* HEADER */
         .site-header {
             background: rgba(255, 255, 255, 0.94);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border-light);
             position: sticky;
@@ -383,6 +384,29 @@
             text-align: center;
         }
 
+        .info-text {
+            margin-top: 1rem;
+        }
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+        }
+        .modal-img {
+            width: 100%;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        .btn-cite-modal {
+            margin-top: 1rem;
+            background: var(--surface-alt);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+        }
         @media (max-width: 500px) {
             .hero h1 { font-size: 1.6rem; }
             .filter-bar { flex-direction: column; align-items: stretch; }
@@ -460,7 +484,7 @@
                     <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                     <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
                 </div>
-                <p style="margin-top: 1rem;">contact@memoire-ecrite.org</p>
+                <p class="info-text">contact@memoire-ecrite.org</p>
                 <p>Abidjan / Dakar / Paris</p>
             </div>
             <div class="footer-col">
@@ -559,7 +583,7 @@
             return true;
         });
         if (filtered.length === 0) {
-            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Aucune publication trouvée.</div>`;
+            container.innerHTML = `<div class="no-results">Aucune publication trouvée.</div>`;
             return;
         }
         container.innerHTML = filtered.map(article => `
@@ -599,11 +623,11 @@
         modalBody.innerHTML = `
             <h2>${escapeHtml(article.title)}</h2>
             <div class="modal-meta"><strong>${article.author}</strong> · ${article.date} · <span class="doi-badge">${article.doi}</span><br><span class="badge-type">${article.typeLabel}</span></div>
-            <img src="${article.img}" style="width:100%; border-radius:0.5rem; margin:1rem 0; max-height:300px; object-fit:cover;" alt="illustration">
+            <img src="${article.img}" class="modal-img" alt="illustration">
             <div>${article.fullContent}</div>
-            <button id="modalCiteBtn" style="margin-top:1rem; background:var(--surface-alt); border:none; padding:0.5rem 1rem; border-radius:var(--radius-btn); cursor:pointer;">📖 Citer l'article</button>
+            <button id="modalCiteBtn" class="btn-cite-modal">📖 Citer l'article</button>
         `;
-        modal.style.display = 'flex';
+        modal.classList.remove('modal-hidden');
         document.getElementById('modalCiteBtn')?.addEventListener('click', () => {
             alert(`Citer : ${article.author} (« ${article.title} »). Mémoire Écrite, ${article.doi}.`);
         });
@@ -645,8 +669,8 @@
     document.getElementById('aboutLink')?.addEventListener('click', (e) => {
         e.preventDefault(); alert("Mémoire Écrite – revue à comité de lecture. Nous visons l'excellence et la diffusion libre des savoirs critiques africains.");
     });
-    closeModalSpan.onclick = () => modal.style.display = 'none';
-    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    closeModalSpan.onclick = () => modal.classList.add('modal-hidden');
+    window.onclick = (e) => { if (e.target === modal) modal.classList.add('modal-hidden'); };
 
     renderArticles();
 </script>

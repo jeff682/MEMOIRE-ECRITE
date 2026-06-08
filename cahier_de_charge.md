@@ -42,7 +42,7 @@ Dans de nombreuses régions d’Afrique, les sources écrites sont rares ou diff
 | Terme | Définition simple |
 |---|---|
 | **DOI** (Digital Object Identifier) | Un numéro unique qui identifie un article de manière permanente. Exemple : `10.5678/memoire.2026.03`. |
-| **API** (Application Programming Interface) | Un système qui permet à d’autres sites ou logiciels de venir chercher automatiquement des informations sur notre plateforme. |
+| **API** (Application Programming Interface) | Un système qui permet à d’autres sites ou logiciels de venir chercher automatiquement des informations sur notre plateforme. |0
 | **DRF** (Django REST Framework) | Une boîte à outils pour créer une API facilement avec Django. |
 | **Pair review** (relecture par les pairs) | Un processus où d’autres experts vérifient la qualité d’un article avant qu’il ne soit publié. |
 | **Open access** (libre accès) | Un article que tout le monde peut lire gratuitement, sans abonnement. |

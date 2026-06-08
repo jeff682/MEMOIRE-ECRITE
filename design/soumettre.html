@@ -50,6 +50,7 @@
         /* HEADER */
         .site-header {
             background: rgba(255, 255, 255, 0.94);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border-light);
             position: sticky;
@@ -310,6 +311,21 @@
             font-size: 0.75rem;
         }
 
+        .year-input {
+            background: #EBE5DD;
+        }
+        #disciplineGroup.hidden {
+            display: none;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-success {
+            color: var(--success);
+        }
+        .file-error {
+            color: var(--error);
+        }
         @media (max-width: 780px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -352,7 +368,7 @@
                 <!-- Type de contenu -->
                 <div class="form-group">
                     <label>Type de publication <span class="required">*</span></label>
-                    <select id="contentType" required>
+                    <select id="contentType" required title="Type de publication">
                         <option value="">Sélectionnez</option>
                         <option value="recherche">Résultat de recherche</option>
                         <option value="litterature">Critique littéraire</option>
@@ -360,9 +376,9 @@
                     </select>
                 </div>
                 <!-- Discipline (pour recherche) -->
-                <div class="form-group" id="disciplineGroup" style="display:none;">
+                <div class="form-group" id="disciplineGroup" class="hidden">
                     <label>Discipline <span class="required">*</span></label>
-                    <select id="discipline">
+                    <select id="discipline" title="Discipline">
                         <option value="">Sélectionnez</option>
                         <option value="histoire">Histoire</option>
                         <option value="anthropologie">Anthropologie</option>
@@ -395,8 +411,8 @@
                 </div>
                 <!-- Année -->
                 <div class="form-group">
-                    <label>Année de soumission</label>
-                    <input type="number" id="year" value="2026" readonly style="background:#EBE5DD;">
+                    <label for="year">Année de soumission</label>
+                    <input type="number" id="year" value="2026" readonly class="year-input">
                 </div>
                 <!-- Résumé -->
                 <div class="form-group full-width">
@@ -414,7 +430,7 @@
                     <div class="file-area" id="fileArea">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Cliquez ou glissez votre fichier ici</p>
-                        <input type="file" id="fileInput" accept=".pdf,.docx" style="display:none;">
+                        <input type="file" id="fileInput" accept=".pdf,.docx">
                     </div>
                     <div id="fileInfo"></div>
                 </div>
@@ -426,7 +442,7 @@
                 <!-- Licence -->
                 <div class="form-group">
                     <label>Licence de publication <span class="required">*</span></label>
-                    <select id="license" required>
+                    <select id="license" required title="Licence de publication">
                         <option value="CC BY-SA 4.0">CC BY-SA 4.0 (Recommandée)</option>
                         <option value="CC BY-NC-ND 4.0">CC BY-NC-ND 4.0</option>
                         <option value="CC0">Domaine public (CC0)</option>
@@ -470,10 +486,10 @@
             <div class="footer-col">
                 <h4>Suivez-nous</h4>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-mastodon"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i><span class="sr-only">Twitter</span></a>
+                    <a href="#" aria-label="Mastodon"><i class="fab fa-mastodon"></i><span class="sr-only">Mastodon</span></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i><span class="sr-only">LinkedIn</span></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i><span class="sr-only">GitHub</span></a>
                 </div>
                 <p>soumission@memoire-ecrite.org</p>
                 <p>Dakar / Abidjan / Paris</p>
@@ -500,10 +516,10 @@
 
     contentTypeSelect.addEventListener('change', function() {
         if (this.value === 'recherche') {
-            disciplineGroup.style.display = 'block';
+            disciplineGroup.classList.remove('hidden');
             disciplineSelect.required = true;
         } else {
-            disciplineGroup.style.display = 'none';
+            disciplineGroup.classList.add('hidden');
             disciplineSelect.required = false;
             disciplineSelect.value = '';
         }
@@ -538,11 +554,11 @@
 
     function updateFileInfo(file) {
         if (file && (file.type === 'application/pdf' || file.name.endsWith('.docx'))) {
-            fileInfo.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> ${file.name} (${(file.size/1024).toFixed(1)} Ko)`;
-            fileInfo.style.color = 'var(--success)';
+            fileInfo.innerHTML = `<i class="fas fa-check-circle file-success"></i> ${file.name} (${(file.size/1024).toFixed(1)} Ko)`;
+            fileInfo.className = 'file-success';
         } else {
             fileInfo.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Format non supporté. Veuillez uploader un PDF ou DOCX.`;
-            fileInfo.style.color = 'var(--error)';
+            fileInfo.className = 'file-error';
         }
     }
 

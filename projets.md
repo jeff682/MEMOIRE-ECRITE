@@ -1,157 +1,196 @@
-Voici une explication claire et technique du projet **Mémoire Écrite**, destinée aux développeurs (mais restant accessible).
 
----
+Cahier des charges – Projet « Mémoire Ecrite »
+Plateforme web de publication, critique et échanges autour des œuvres culturelles
 
-## Mémoire Écrite – Présentation pour les développeurs
+1. Contexte et objectif du projet
+Nous souhaitons créer une plateforme numérique dédiée à la valorisation des œuvres culturelles (littérature, cinéma, théâtre, arts de la scène).
+Sur cette plateforme, les administrateurs publient des articles (annonces d’événements, expressions libres).
+Les utilisateurs inscrits peuvent à leur tour proposer des articles – obligatoirement attachés à une œuvre existante – ainsi que des critiques et des commentaires.
 
-### Objectif général
+L’objectif est de disposer d’un outil modéré, interactif et facile à administrer, qui permette à la fois une éditorialisation officielle et une contribution citoyenne structurée.
+2. Périmètre fonctionnel (ce que la plateforme doit faire)
+2.1 Gestion des œuvres
+Une œuvre est définie par : titre, auteur/réalisateur/metteur en scène, année, catégorie (littérature, cinéma, théâtre…), résumé, image (couverture/affiche).
+Seuls les administrateurs créent, modifient ou suppriment des fiches œuvres.
+Chaque œuvre a une page publique dédiée, qui rassemble les articles contributeurs, critiques et commentaires associés.
+2.2 Rôles et permissions
+Rôle
+Capacités
+Visiteur non inscrit
+Consultation de tout le contenu, pas d’interaction.
+Utilisateur inscrit
+Proposer des articles contributeurs (liés à une œuvre), déposer des critiques et commentaires, gérer son espace personnel.
+Contributeur (statut automatique)
+Idem utilisateur, mais ses articles sont soumis à modération avant publication.
+Administrateur
+CRUD complet sur œuvres, articles officiels, modération de tous les contenus utilisateurs, gestion des utilisateurs.
 
-Mémoire Écrite est une plateforme web de publication savante en libre accès. Elle permet de diffuser des **résultats de recherche**, des **critiques littéraires** et des **critiques cinématographiques** sur l’Afrique et les diasporas africaines. Les contenus sont évalués par les pairs (peer review), obtiennent un **DOI** et sont exposés via une **API publique** pour être réutilisés par d’autres plateformes (Google Scholar, bibliothèques numériques, agrégateurs).
+2.3 Contenus publiés par les administrateurs
+Deux formats :
 
----
+Annonce d’événement : titre, date, lieu, programme, lien externe éventuel.
+Expression libre : éditorial, billet personnel, sans rattachement obligatoire à une œuvre (mais un lien facultatif vers une œuvre est possible).
+2.4 Contenus proposés par les utilisateurs (article contributeur)
+Obligatoirement lié à une œuvre existante (sélection dans un menu déroulant).
+Formulaire avec : titre, corps de texte (WYSIWYG), case à cocher « spoiler ».
+Une fois soumis, l’article passe en modération (publié uniquement après validation admin).
+L’utilisateur reçoit une notification par email du résultat.
+2.5 Critiques (notes et avis)
+Tout utilisateur inscrit peut déposer une critique sur une œuvre.
+La critique contient : une note (ex. 0 à 5 étoiles) et un texte d’au moins 50 caractères.
+Pas de modération a priori possible, mais :
+Un bouton « Signaler » pour les lecteurs.
+Après 3 signalements, la critique est masquée automatiquement et notifiée aux admins.
+2.6 Commentaires
+Commentaires possibles sur :
+Tout article (admin ou contributeur)
+Toute critique
+Le commentaire est un texte simple avec pseudo et date.
+Modération : publication immédiate pour les utilisateurs ayant déjà 3 commentaires approuvés ; sinon modération a priori (validation admin avant affichage).
+2.7 Flux entrants : récupération de commentaires / critiques externes
+La plateforme doit offrir deux moyens d’importer des commentaires/critiques depuis des sources externes :
 
-### Cible utilisateurs
+API REST sécurisée (endpoint /api/comments et /api/reviews) permettant à des partenaires (réseaux sociaux, presse, etc.) de soumettre des contenus.
+Import ponctuel par fichier CSV (interface admin) pour migrer des données existantes.
 
-- **Visiteurs** : lecture gratuite, recherche, filtres (type, discipline, année).
-- **Auteurs** (compte) : soumission d’articles, suivi du processus d’évaluation.
-- **Réviseurs** : évaluation (accepter/refuser/demander modifications).
-- **Éditeurs** : attribution de DOI, publication, gestion des utilisateurs et des catégories.
+Chaque commentaire ou critique importé doit être attribué à un utilisateur existant ou à un compte générique « invité validé ».
+3. Spécifications techniques
+3.1 Stack technique imposée 
+Back-end
+Framework unique : Django (version LTS, par exemple 4.2 ou 5.0).
+Django REST Framework (DRF) pour la création de l’API REST (endpoints /api/comments, /api/reviews, etc.).
+Authentification : gestion des sessions Django + tokens d’API (DRF TokenAuthentication ou Simple JWT) pour les soumissions externes.
+Base de données
+PostgreSQL (recommandé pour la fiabilité et les performances) ou MySQL/MariaDB (acceptable).
+L’agence utilisera l’ORM Django pour toutes les interactions.
+Front-end
+Templates Django pour les pages publiques (administration, modération, espace utilisateur) – solution intégrée rapide.
+CSS : framework léger comme Tailwind CSS ou Bootstrap (au choix de l’agence, validé par le client).
+JavaScript : vanilla JS pour les interactions simples (affichage des spoilers, signalements). Pour les composants riches (éditeur WYSIWYG, prévisualisation), utilisation de HTMX ou Alpine.js – pas de framework lourd type React, sauf justification forte (l’agence devra alors proposer un découpage SPA partiel).
+Hébergement
+L’application doit pouvoir tourner sur un hébergement mutualisé compatible Python/Django (via WSGI).
+L’agence conseillera une solution adaptée au budget et au trafic prévu. Le client reste libre du choix final, mais l’agence livrera une configuration prête à déployer.
 
----
+Exigences complémentaires
+Utilisation des migrations Django pour la gestion du schéma de base de données.
+Environnement virtuel (pipenv, poetry ou venv) et requirements.txt fourni.
+Variables d’environnement pour séparer les paramètres de développement / production (SECRET_KEY, DEBUG, DATABASE_URL, etc.).
+Interface admin Django : l’agence l’utilisera pour les fonctionnalités d’administration (modération des articles, signalements) sauf si une interface sur mesure est explicitement demandée. Dans ce cas, les deux coexisteront.
+3.2 Exigences non fonctionnelles
+Performance : temps de chargement des pages < 2 secondes (moyenne).
+Responsive : adaptation aux mobiles, tablettes et desktop.
+Sécurité : protection XSS, CSRF, injection SQL, rate limiting sur les soumissions (formulaires et API).
+Accessibilité : niveau RGAA (référentiel général d’amélioration de l’accessibilité) partiel – navigation clavier, contrastes.
+Maintenabilité : code commenté, documentation d’administration (manuel utilisateur pour les admins).
+4. Contraintes légales et éditoriales
+Modération : l’agence doit prévoir un tableau de bord admin pour :
+Valider/rejeter les articles contributeurs.
+Consulter les signalements.
+Masquer/supprimer tout commentaire ou critique.
+Charte d’utilisation : à intégrer sous forme de page « Conditions générales d’utilisation » et « Charte de modération » (textes fournis par le client).
+Protection des données : conformité RGPD (droit à l’oubli, export des données personnelles, consentement à la publication). L’agence devra inclure une page « Politique de confidentialité » générique.
+5. Livrables attendus
+Livrable
+Description
+Plateforme fonctionnelle
+Code source déployé sur un serveur de recette, puis sur serveur de production
+Documentation technique
+Architecture, variables d’environnement, procédure de backup/restauration
+Manuel d’administration
+Gestion des œuvres, modération, import CSV, configuration de l’API
+Jeu de données de test
+5 œuvres fictives, 3 articles admin, 5 articles contributeurs, 10 critiques, 20 commentaires
+Formation (2h)
+Session en visio pour les administrateurs (client)
 
-### Stack technique
+6. Planning indicatif
+Phase
+Durée
+Tâches clés
+Cadrage et spécifications détaillées
+1 semaine
+Échanges sur les cas précis, validation des écrans
+Conception (UX/UI)
+1 semaines
+Maquettes cliquables (Figma), validation client
+Développement back-end + API
+3 semaines
+Modèles, endpoints, modération, import
+Développement front-end
+2 semaines
+Pages publiques, formulaires, espace utilisateur, responsive
+Tests & correction
+2 semaines
+Tests fonctionnels, sécurité, performance
+Livraison & formation
+1 semaine
+Déploiement, recette finale, livraison des docs
+Total
+10 semaines
 
-| Composant | Choix |
-|-----------|-------|
-| Backend | **Django** (Python) + **Django REST Framework (DRF)** |
-| Base de données | **PostgreSQL** (recherche plein texte, robustesse) |
-| Frontend | HTML/CSS/JS (Django templates, aucune SPA lourde) – design responsive, couleurs mates |
-| Stockage de fichiers | Système de fichiers local ou cloud (PDF, avatars) |
-| Authentification | Sessions Django + JWT (via `djangorestframework-simplejwt` pour l’API) |
-| API | DRF – endpoints publics (lecture seule) et privés (soumission, évaluation) |
-| Hébergement | VPS (OVH, Scaleway, DigitalOcean) avec Gunicorn + Nginx + PostgreSQL |
 
----
 
-### Architecture des applications Django
+7. Budget indicatif
+Poste
+Description
+Coût (FCFA HT)
+1. Cadrage et spécifications
+Atelier en ligne (2h) pour finaliser les user stories, validation des écrans
+150 000
+2. Conception (UI/UX)
+Maquettes simples (type wireframes) pour les pages clés : accueil, fiche œuvre, formulaire article, espace utilisateur
+250 000
+3. Développement back-end Django
+- Modèles (œuvres, articles admin, articles contributeurs, critiques, commentaires, signalements)
+- Système d’authentification (inscription/connexion)
+- Tableau de bord admin personnalisé pour la modération (basé sur l’admin Django)
+- Workflow de validation des articles contributeurs
+- Gestion des signalements et masquage automatique
+1 200 000
+4. Développement front-end (templates Django)
+- Intégration des maquettes (HTML/CSS, Bootstrap ou Tailwind)
+- Formulaires (ajout d’article contributeur, critique, commentaire)
+- Page responsive (mobile/tablette)
+- Affichage des spoilers avec bouton JS
+800 000
+5. API REST (Django REST Framework)
+- Endpoint de récupération des œuvres (GET)
+- Endpoint sécurisé pour soumettre commentaire/critique (POST)
+- Clé d’API simple pour les partenaires
+500 000
+6. Import CSV (critiques / commentaires)
+Interface admin pour importer un fichier CSV (colonnes définies) et assignation à un utilisateur existant ou générique
+300 000
+7. Tests, correction et déploiement
+- Tests fonctionnels sur l’environnement de recette
+- Correction des bugs bloquants
+- Déploiement initial sur serveur fourni par le client (ou aide à la configuration)
+250 000
+8. Documentation et formation
+- Manuel d’administration (PDF)
+- Formation en visio (1h) pour les administrateurs
+90 000
+Total HT
 
-| App | Rôle |
-|-----|------|
-| `core` | Modèles transversaux : `TypeDocument` (recherche, littérature, cinéma), `Discipline` (histoire, géographie, etc.), fonctions utilitaires. |
-| `accounts` | Gestion des utilisateurs, profils, rôles (auteur, réviseur, éditeur), authentification (login/logout/register), réinitialisation de mot de passe. |
-| `publication` | Cœur du métier : modèle `Publication` (titre, résumé, fichier PDF, DOI, statut, auteur, date de soumission/publication, mots-clés), vues de liste et de détail, formulaires de soumission. |
-| `review` | Processus d’évaluation : modèle `Review` (lien vers Publication, réviseur, commentaire, décision, date). Workflow de changement d’état de la publication (brouillon → en relecture → accepté/refusé). |
-| `search` | Recherche avancée et filtres (utilisation du moteur de recherche plein texte de PostgreSQL ou intégration de `django‑haystack`/Elasticsearch). |
-| `api` | Endpoints DRF : sérialiseurs pour `Publication`, `Review`, `User`. Authentification JWT pour les actions protégées. Documentation OpenAPI via `drf‑spectacular`. |
 
----
+3 540 000
 
-### Workflow de publication (cycle de vie d’un article)
 
-1. **Soumission** : un auteur connecté remplit un formulaire (titre, résumé, PDF, mots‑clés, type, discipline). L’article est créé en statut `brouillon`.
-2. **Envoi en relecture** : l’auteur ou l’éditeur change le statut en `en_attente`.
-3. **Évaluation** : un réviseur assigné lit l’article et peut :
-   - `accepter` → statut `accepte`
-   - `refuser` → statut `refuse`
-   - `demander_modifications` → statut `modification_demandee` (l’auteur peut soumettre une nouvelle version)
-4. **Publication** : un éditeur attribue un DOI (généré automatiquement via une API Crossref ou factice) et passe le statut à `public`. L’article devient visible sur le site.
+8. Critères de validation (acceptation du projet)
+Le projet sera considéré comme livré et accepté lorsque les conditions suivantes seront remplies :
 
----
+Fonctionnalités : tous les cas d’usage décrits sections 2.1 à 2.7 sont opérationnels.
+Modération : les trois flux (articles contributeurs, commentaires, signalements) fonctionnent comme défini.
+API : les endpoints POST répondent correctement avec authentification.
+Import CSV : possibilité d’importer au moins 100 commentaires en une fois.
+Qualité : absence de blocage ou d’erreur critique durant la recette (sur Chrome, Firefox, Safari, Edge responsive).
+Documentation : le manuel d’administration permet à un non-développeur de modérer et d’exporter les données.
+9. Conditions particulières pour la réponse de l’agence
+L’agence devra fournir dans sa proposition :
 
-### Modèle de données principal (simplifié)
+Une proposition technique détaillée (architecture, langages, bibliothèques).
+Un planning réaliste et un devis.
+Des références de projets similaires (plateformes avec modération de contenu utilisateur).
+La politique de maintenance post-livraison (optionnelle) : correctifs, évolutions, support.
 
-```python
-class Publication(models.Model):
-    STATUS_CHOICES = (...)
-    title = models.CharField(max_length=500)
-    abstract = models.TextField()
-    pdf = models.FileField(upload_to='publications/')
-    doi = models.CharField(max_length=100, unique=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    type_doc = models.ForeignKey(TypeDocument, on_delete=models.PROTECT)   # recherche, littérature, cinéma
-    disciplines = models.ManyToManyField(Discipline)
-    keywords = models.CharField(max_length=500)
-    submission_date = models.DateTimeField(auto_now_add=True)
-    publication_date = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='draft')
-```
 
----
-
-### API publique (DRF)
-
-Tous les endpoints sont sous `/api/v1/`. Quelques exemples :
-
-| Endpoint | Méthode | Accès | Description |
-|----------|---------|-------|-------------|
-| `/api/v1/publications/` | GET | public | Liste paginée des publications (statut `public`) avec filtres (type, discipline, année) |
-| `/api/v1/publications/{id}/` | GET | public | Détail complet d’une publication (métadonnées + résumé) |
-| `/api/v1/publications/{id}/download/` | GET | public | Téléchargement du PDF |
-| `/api/v1/soumettre/` | POST | auteur (JWT) | Soumission d’un nouvel article (multipart/form-data) |
-| `/api/v1/evaluations/` | POST | réviseur (JWT) | Ajout d’une évaluation (commentaire, décision) |
-| `/api/v1/mes-publications/` | GET | auteur (JWT) | Liste des publications de l’auteur connecté |
-
-**Documentation** : `/api/schema/swagger-ui/` (via `drf-spectacular`).
-
----
-
-### Authentification
-
-- **Frontend** : sessions Django classiques (`LoginView`, `LogoutView`).
-- **API** : JWT (`djangorestframework-simplejwt`). Un endpoint `/api/token/` fournit un *access* token et un *refresh* token.
-
----
-
-### Exigences non‑fonctionnelles (pour les développeurs)
-
-- **Responsive / Mobile‑first** : le HTML/CSS doit s’adapter aux téléphones, tablettes et desktop.
-- **Accessibilité** : contraste suffisant, balises sémantiques, attributs `alt`.
-- **Performance** : les requêtes sur la liste des publications doivent être paginées (défaut : 20 par page). Index sur `status`, `type_doc`, `discipline`.
-- **Sécurité** : validation des fichiers uploadés (PDF), protection CSRF, `HttpOnly` cookies, `X-Frame-Options`, etc.
-- **Tests** : couverture minimale des modèles, formulaires, vues critiques (soumission, évaluation). Utiliser `pytest-django`.
-
----
-
-### Livrables attendus (pour une équipe de développement)
-
-1. **Code source** : dépôt Git (GitHub ou GitLab) avec `requirements.txt`, `README.md` (installation, variables d’environnement, migrations).
-2. **Base de données** : script de migration initiale et fixtures (exemples de types, disciplines).
-3. **Fichiers statiques** : CSS compilé, JS, images.
-4. **API** : documentation interactive (Swagger/ReDoc).
-5. **Fichier de configuration** : exemple `.env` (SECRET_KEY, DB_URL, EMAIL_HOST, etc.).
-6. **Procédure de déploiement** (optionnelle) : Dockerfile + docker‑compose, ou playbook Ansible.
-
----
-
-### Environnement de développement (recommandé)
-
-```bash
-git clone https://github.com/memoire-ecrite/memoire-ecrite.git
-cd memoire-ecrite
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # puis éditer
-python manage.py migrate
-python manage.py loaddata initial_data.json   # types, disciplines, superuser
-python manage.py runserver
-```
-
-Le site est accessible sur `http://localhost:8000`.
-
----
-
-### Points d’attention techniques
-
-- **Stockage des PDF** : attention à la taille maximale (configurer `DATA_UPLOAD_MAX_NUMBER_FIELDS` et `MAX_UPLOAD_SIZE`). Utiliser `FileField` avec un répertoire par année/mois.
-- **DOI** : en première version, on peut générer un DOI factice (ex. `10.5678/memoire.{année}.{id}`). L’intégration réelle avec Crossref nécessite un compte et une requête HTTPS.
-- **Recherche** : commencer avec la recherche simple (`icontains`) sur `title`, `abstract`, `keywords`. Pour la v2, passer à PostgreSQL `SearchVector`.
-- **Emails** : configurer un backend SMTP (SendGrid, Mailgun, ou console en développement).
-
----
-
-### Conclusion pour l’équipe de développement
-
-Mémoire Écrite est un projet Django classique mais complet : authentification complexes (rôles), workflow d’évaluation, API publique et stockage de fichiers. L’accent doit être mis sur la **clarté du code**, la **sécurité** et la **documentation** pour permettre à d’autres développeurs de reprendre le projet. Le frontend reste volontairement simple (Django templates) pour faciliter la maintenance.
-
-Toute question relative à l’architecture ou aux choix techniques peut être discutée dans les issues du dépôt. Bon développement !

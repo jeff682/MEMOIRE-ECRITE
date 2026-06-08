@@ -49,6 +49,7 @@
         /* HEADER */
         .site-header {
             background: rgba(255, 255, 255, 0.94);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border-light);
             position: sticky;
@@ -338,6 +339,72 @@
             .filter-row { flex-direction: column; align-items: stretch; }
             select, input { max-width: 100%; }
         }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.modal-hidden {
+            display: none;
+        }
+        .modal-content {
+            background: var(--surface-white);
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            border-radius: var(--radius-modal);
+            padding: 1.5rem;
+            overflow: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 0.8rem;
+            right: 1.2rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .filter-input {
+            max-width: 100%;
+        }
+        .filter-col {
+            flex: 1;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+        }
+        .modal-img {
+            width: 100%;
+            border-radius: 0.5rem;
+            margin: 0.8rem 0;
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .btn-cite-modal {
+            margin-top: 1rem;
+            background: var(--surface-alt);
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -367,21 +434,21 @@
     <div class="filters-panel">
         <div class="filter-group">
             <label>🔍 Mot-clé / auteur / titre</label>
-            <input type="text" id="keyword" placeholder="Ex: mémoire, oralité, Sembène..." style="max-width:100%;">
+            <input type="text" id="keyword" placeholder="Ex: mémoire, oralité, Sembène..." class="filter-input">
         </div>
         <div class="filter-row">
-            <div style="flex:1">
+            <div class="filter-col">
                 <label>📂 Type de contenu</label>
-                <select id="typeFilter">
+                <select id="typeFilter" title="Type de contenu">
                     <option value="all">Tous</option>
                     <option value="recherche">Résultat de recherche</option>
                     <option value="litterature">Critique littéraire</option>
                     <option value="cinema">Critique cinéma</option>
                 </select>
             </div>
-            <div style="flex:1">
+            <div class="filter-col">
                 <label>🏷️ Discipline (pour recherche)</label>
-                <select id="disciplineFilter">
+                <select id="disciplineFilter" title="Discipline">
                     <option value="all">Toutes</option>
                     <option value="histoire">Histoire</option>
                     <option value="anthropologie">Anthropologie</option>
@@ -390,16 +457,16 @@
                     <option value="sociologie">Sociologie</option>
                 </select>
             </div>
-            <div style="flex:1">
+            <div class="filter-col">
                 <label>📅 Année de publication</label>
-                <select id="yearFilter">
+                <select id="yearFilter" title="Année de publication">
                     <option value="all">Toutes</option>
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
                 </select>
             </div>
-            <div style="flex:1">
+            <div class="filter-col">
                 <label>👤 Auteur·ice</label>
                 <input type="text" id="authorFilter" placeholder="Nom de l'auteur">
             </div>
@@ -417,7 +484,7 @@
                 <label><input type="checkbox" value="manuscrit"> manuscrit</label>
             </div>
         </div>
-        <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+        <div class="filter-actions">
             <button class="btn-search" id="searchBtn"><i class="fas fa-filter"></i> Appliquer les filtres</button>
             <button class="btn-reset" id="resetBtn"><i class="fas fa-undo-alt"></i> Réinitialiser</button>
         </div>
@@ -446,9 +513,9 @@
             <div class="footer-col">
                 <h4>Suivre</h4>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-mastodon"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Mastodon"><i class="fab fa-mastodon"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
                 <p>search@memoire-ecrite.org</p>
             </div>
@@ -460,9 +527,9 @@
 </footer>
 
 <!-- Modal pour lire l'article -->
-<div id="articleModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
-    <div style="background: var(--surface-white); max-width:700px; width:90%; max-height:85vh; border-radius:var(--radius-modal); padding:1.5rem; overflow:auto; position:relative;">
-        <span id="closeModal" style="position:absolute; top:0.8rem; right:1.2rem; font-size:1.8rem; cursor:pointer;">&times;</span>
+<div id="articleModal" class="modal modal-hidden">
+    <div class="modal-content">
+        <span id="closeModal" class="modal-close">&times;</span>
         <div id="modalBody"></div>
     </div>
 </div>
@@ -556,7 +623,7 @@
     function renderResults(articles) {
         resultCountSpan.innerText = articles.length;
         if (articles.length === 0) {
-            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Aucun article ne correspond à vos critères. Essayez d’élargir la recherche.</div>`;
+            container.innerHTML = `<div class="no-results">Aucun article ne correspond à vos critères. Essayez d'élargir la recherche.</div>`;
             return;
         }
         container.innerHTML = articles.map(article => {
@@ -605,11 +672,11 @@
         modalBody.innerHTML = `
             <h2>${escapeHtml(article.title)}</h2>
             <div><strong>${article.author}</strong> · ${article.year} · <span class="doi-badge">${article.doi}</span></div>
-            <img src="${article.img}" style="width:100%; border-radius:0.5rem; margin:0.8rem 0; max-height:200px; object-fit:cover;" alt="">
+            <img src="${article.img}" class="modal-img" alt="${escapeHtml(article.title)}">
             <div>${article.fullContent}</div>
-            <button id="modalCiteBtn" style="margin-top:1rem; background:var(--surface-alt); border:none; padding:0.4rem 1rem; border-radius:var(--radius-btn); cursor:pointer;">📖 Citer l'article</button>
+            <button id="modalCiteBtn" class="btn-cite-modal">📖 Citer l'article</button>
         `;
-        modal.style.display = 'flex';
+        modal.classList.remove('modal-hidden');
         const citeModal = document.getElementById('modalCiteBtn');
         if (citeModal) citeModal.onclick = () => alert(`Citer : ${article.author} (« ${article.title} »). Mémoire Écrite, ${article.doi}.`);
     }
@@ -626,8 +693,8 @@
 
     searchBtn.addEventListener('click', filterArticles);
     resetBtn.addEventListener('click', resetFilters);
-    closeModal.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    closeModal.addEventListener('click', () => modal.classList.add('modal-hidden'));
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('modal-hidden'); });
 
     // Navigation mobile
     document.getElementById('menuToggle').addEventListener('click', () => {
